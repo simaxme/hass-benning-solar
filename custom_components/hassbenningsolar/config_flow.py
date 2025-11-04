@@ -10,6 +10,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 from homeassistant.const import CONF_HOST, CONF_PASSWORD, CONF_USERNAME
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.storage import Store
 
 from .exceptions.cannot_connect import CannotConnect
 from .exceptions.invalid_auth import InvalidAuth
@@ -43,9 +44,21 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     #     your_validate_func, data[CONF_USERNAME], data[CONF_PASSWORD]
     # )
 
-    hub = BenningClient(hass, data[CONF_HOST], data[CONF_USERNAME], data[CONF_PASSWORD])
+    client = BenningClient(hass, data[CONF_HOST], data[CONF_USERNAME], data[CONF_PASSWORD])
 
-    await hub.authenticate()
+    await client.authenticate()
+
+   
+    available_entries = await client.get_available_entries()
+
+    store = Store(hass, 1, "benning_config")
+    await store.async_save({
+        "available_entries": available_entries,
+        "host": data[CONF_HOST],
+        "username": data[CONF_USERNAME],
+        "password": data[CONF_PASSWORD]
+    })
+
 
     # If you cannot connect:
     # throw CannotConnect

@@ -1,11 +1,19 @@
+from datetime import timedelta
 import aiohttp
+from homeassistant.config_entries import ConfigEntry
 import homeassistant.helpers.aiohttp_client as aiohttp_client
 from homeassistant.core import HomeAssistant
 
+from custom_components.hassbenningsolar.exceptions.cannot_connect import CannotConnect
 from custom_components.hassbenningsolar.exceptions.entry_not_available import EntryNotAvailable
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 import json
 from .exceptions.invalid_auth import InvalidAuth
+import logging
+import async_timeout
+
+_LOGGER = logging.getLogger(__name__)
 
 class BenningClient:
     hass: HomeAssistant
@@ -32,14 +40,19 @@ class BenningClient:
             "name": self.username,
             "pass": self.password
         }
- 
-        async with session.get(self.get_base_url() + "/login.cgi", params=params) as response:
-            if response.status != 200:
-                raise InvalidAuth
 
-            content = await response.text()
+        try:
+            async with async_timeout.timeout(15):
+                async with session.get(self.get_base_url() + "/login.cgi", params=params) as response:
+                    if response.status != 200:
+                        raise InvalidAuth
 
-            print("RESPONSE: ", content)
+                    content = await response.text()
+
+                    if content == "-1":
+                        raise InvalidAuth
+        except TimeoutError:
+            raise CannotConnect
 
 
     async def get_entry(self, oid: int):
