@@ -7,7 +7,7 @@
   "version": "0.0.1",
   "config_flow": true,
   "dependencies": [],
-  "documentation": "https://www.home-assistant.io/integrations/hassbenningsolar",
+  "documentation": "https://github.com/simaxme/hass-benning-solar",
   "homekit": {},
   "iot_class": "local_polling",
   "quality_scale": "bronze",

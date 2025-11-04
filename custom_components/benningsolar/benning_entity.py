@@ -11,21 +11,51 @@ from .const import DOMAIN
 from .benning_client import BenningClient
 
 class BenningEntity(SensorEntity, CoordinatorEntity):
+    """
+    A entity representing one specific entry / oid of the inverter.
+    """
+ 
     hass: HomeAssistant
-    coordinator: DataUpdateCoordinator
-    benning_client: BenningClient
-    entry: ConfigEntry
-    _unique_id: str
-    _name: str
-    _unit: str
-    _oid: int
+    """
+    The HomeAssistance Instance
+    """
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, coordinator: DataUpdateCoordinator, benning_client: BenningClient, id: str, name: str, unit: str, oid: int):
+    coordinator: DataUpdateCoordinator
+    """
+    The coordinator for receiving update events
+    """
+
+    entry: ConfigEntry
+    """
+    The config entry instance.
+    Used for access the specific entry id for uniquiely identifying the entitie's device.
+    """
+
+    _unique_id: str
+    """
+    The unique id of this entity
+    """
+
+    _name: str
+    """
+    The name of this entity
+    """
+
+    _unit: str
+    """
+    The unit of this value.
+    """
+
+    _oid: int
+    """
+    The oid of this value
+    """
+
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, coordinator: DataUpdateCoordinator, id: str, name: str, unit: str, oid: int):
         SensorEntity.__init__(self)
         CoordinatorEntity.__init__(self, coordinator)
 
         self.hass = hass
-        self.benning_client = benning_client
         self.coordinator = coordinator
         self.entry = entry
         self._unique_id = id
@@ -61,5 +91,9 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
 
     @callback
     def _handle_coordinator_update(self) -> None:
+        """
+        Handle the coordinator update, will just extract the data.
+        """
+
         self._attr_native_value = self.coordinator.data[str(self._oid)]["val"]
         self.async_write_ha_state()

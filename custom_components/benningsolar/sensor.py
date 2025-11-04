@@ -14,31 +14,33 @@ class ConfigMissing(HomeAssistantError):
     pass
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
-    store = Store(hass, 1, "benning_config")
+    """
+    Will setup the sensor entries for the integration.
+    """
 
+
+    # First we will load the stored entities and config using the store API
+    store = Store(hass, 1, "benning_config")
     benning_config: dict | None = await store.async_load()
 
     if benning_config == None:
         raise ConfigMissing
 
     available_entries = benning_config["available_entries"]
-
     client = BenningClient(hass, benning_config["host"], benning_config["username"], benning_config["password"])
 
+    # Then we need to extract the oids such that the coordinator knows which exact oids he needs to fetch.
     oids: list[int] = []
     for bentry in available_entries:
         oids.append(bentry["oid"])
-
     coordinator = BenningCoordinator(hass, entry, client, oids)
 
-    result_entities: list[BenningEntity] = []
 
+    # Setting up the entities
+    result_entities: list[BenningEntity] = []
     for bentry in available_entries:
         id = "benning_" + str(bentry["oid"]) + "_".join(str(bentry["label"]).split("."))
-        entity = BenningEntity(hass, entry, coordinator, client, id, bentry["uitext"], bentry["unit"], bentry["oid"])
+        entity = BenningEntity(hass, entry, coordinator, id, bentry["uitext"], bentry["unit"], bentry["oid"])
         result_entities.append(entity)
-
     async_add_entities(result_entities)
-
-    # async_add_entities([BenningEntity(hass, entry, client)])
 

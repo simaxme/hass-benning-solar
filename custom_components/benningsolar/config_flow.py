@@ -21,7 +21,6 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
-# TODO adjust the data schema to the data that you need
 STEP_USER_DATA_SCHEMA = vol.Schema(
     {
         vol.Required(CONF_HOST): str,
@@ -32,23 +31,18 @@ STEP_USER_DATA_SCHEMA = vol.Schema(
 
 
 async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str, Any]:
-    """Validate the user input allows us to connect.
-
-    Data has the keys from STEP_USER_DATA_SCHEMA with values provided by the user.
     """
-    # TODO validate the data can be used to set up a connection.
-
-    # If your PyPI package is not built with async, pass your methods
-    # to the executor:
-    # await hass.async_add_executor_job(
-    #     your_validate_func, data[CONF_USERNAME], data[CONF_PASSWORD]
-    # )
+    Validate the user input allows us to connect.
+    This will also load all available entries and store them (which causes this function to take a couple of minutes).
+    """
 
     client = BenningClient(hass, data[CONF_HOST], data[CONF_USERNAME], data[CONF_PASSWORD])
 
     await client.authenticate()
 
-   
+  
+    # Load all available entities and store the entities
+    # NOTE: this may take a couple of minutes.
     available_entries = await client.get_available_entries()
 
     store = Store(hass, 1, "benning_config")

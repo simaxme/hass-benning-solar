@@ -1,12 +1,8 @@
-from datetime import timedelta
-import aiohttp
-from homeassistant.config_entries import ConfigEntry
 import homeassistant.helpers.aiohttp_client as aiohttp_client
 from homeassistant.core import HomeAssistant
 
 from .exceptions.cannot_connect import CannotConnect
 from .exceptions.entry_not_available import EntryNotAvailable
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 import json
 from .exceptions.invalid_auth import InvalidAuth
@@ -16,24 +12,48 @@ import async_timeout
 _LOGGER = logging.getLogger(__name__)
 
 class BenningClient:
-    hass: HomeAssistant
-    host_url: str
-    username: str
-    password: str
-    token: str
+    """
+    A client that will interact with the API of the inverter.
+    """
 
-    def __init__(self, hass: HomeAssistant, host_url: str, username: str, password: str):
+    hass: HomeAssistant
+    """
+    The hass instance to create a client session
+    """
+
+    host: str
+    """
+    The ip of the host.
+    """
+
+    username: str
+    """
+    The username to authenticate with the host.
+    """
+    
+    password: str
+    """
+    The password to authenticate with the password
+    """
+
+
+    def __init__(self, hass: HomeAssistant, host: str, username: str, password: str):
         self.hass = hass
-        self.host_url = host_url
+        self.host = host
         self.username = username
         self.password = password
 
-        print("Benning hub initialized!")
-
     def get_base_url(self) -> str:
-        return "http://" + self.host_url
+        """
+        Returns the base url to which requests are made.
+        """
+        return "http://" + self.host
 
     async def authenticate(self):
+        """
+        Will try to authenticate with the inverter's API with the given host and credentials parameter.
+        Currently only used to validate that the connection works properly.
+        """
         session = aiohttp_client.async_get_clientsession(self.hass)
 
         params = {
@@ -56,6 +76,10 @@ class BenningClient:
 
 
     async def get_entry(self, oid: int):
+        """
+        Will return a specific entry from the API.
+        Please consider using get_entries(oids) if wanting to get multiple entries at once.
+        """
         session = aiohttp_client.async_get_clientsession(self.hass)
 
         params = {
@@ -74,6 +98,10 @@ class BenningClient:
             return await response.json()
 
     async def get_entries(self, oids: list[int]) -> list:
+        """
+        Will return a list of specified entries from the API
+        Note this will ignore unkown oids and will return an empty array if no oids match.
+        """
         session = aiohttp_client.async_get_clientsession(self.hass)
 
         params = {
@@ -101,6 +129,11 @@ class BenningClient:
 
 
     async def get_available_entries(self) -> list:
+        """
+        Will try to gather all entries that can be accessed through the API
+        Note this is basically bruteforcing the oids and therefore may take a while.
+        (yes, there is no endpoint to gather a list of all endpoints :/)
+        """
         res: list[int] = []
 
         for i in range(0, 100):

@@ -3,14 +3,16 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
-from .benning_entity import BenningEntity
-
 from .benning_client import BenningClient
 import logging
 
 _LOGGER = logging.getLogger(__name__)
 
 class BenningCoordinator(DataUpdateCoordinator):
+    """
+    The coordinator that manages the automatic update of all values.
+    """
+
     hass: HomeAssistant
     client: BenningClient
     oids: list[int]
@@ -31,6 +33,10 @@ class BenningCoordinator(DataUpdateCoordinator):
         self.oids = oids
 
     async def _async_update_data(self):
+        """
+        Update event
+        """
+
         available_entries = await self.client.get_entries(self.oids)
         mapping = {}
         for entry in available_entries:
