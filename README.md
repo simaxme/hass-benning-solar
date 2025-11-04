@@ -1,5 +1,7 @@
 # Benning Solar Inverter Home Assistant Integration
 
+![](./logo/benningimage.svg)
+
 This is accessing Benning Solar Inverters. This will use the internal Web-API of the Inverters to extract information from the inverter, such as details about current power usage etc.
 
 ## Setting up this plugin
