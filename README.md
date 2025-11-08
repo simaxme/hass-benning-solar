@@ -50,5 +50,5 @@ I do not know whether there may have been API changes in other versions of the i
 
 ### Setting up the integration takes very long, why?
 
-The first the integration is setup, it needs to get all available endpoints/values that can be mapped to a sensor in HASS. Because the API does not provide endpoints for checking these, it will "bruteforce" all available endpoints by checking a huge range of identifiers.
-Though the API documentation includes a list of all OIDs with their mappings, they do not always seem to properly match.
+The first time the integration is setup, it needs to get all available endpoints/values that can be mapped to a sensor in HASS. Because the API does not provide endpoints for checking these, it will "bruteforce" all available endpoints by checking a huge range of identifiers.
+Though the API documentation includes a table of all OIDs with their mappings, they do not always seem to properly match.
