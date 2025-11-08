@@ -6,6 +6,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
+from .utils import parse_number
 from .const import DOMAIN
 
 from .benning_client import BenningClient
@@ -95,5 +96,10 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
         Handle the coordinator update, will just extract the data.
         """
 
-        self._attr_native_value = self.coordinator.data[str(self._oid)]["val"]
+        data = self.coordinator.data[str(self._oid)]
+
+        if data == None:
+            return
+
+        self._attr_native_value = parse_number(data)
         self.async_write_ha_state()
