@@ -4,7 +4,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity import Entity
-from homeassistant.components.sensor import SensorDeviceClass, SensorEntity
+from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
 from .utils import parse_number
@@ -114,6 +114,17 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
 
         if self._unit in ["Hz"]:
             return SensorDeviceClass.FREQUENCY
+
+        return None
+
+    @cached_property
+    @override
+    def state_class(self) -> SensorStateClass | None:
+        if self.device_class == SensorDeviceClass.ENERGY:
+            return SensorStateClass.TOTAL_INCREASING
+
+        if self.device_class in [SensorDeviceClass.POWER, SensorDeviceClass.TEMPERATURE, SensorDeviceClass.CURRENT, SensorDeviceClass.APPARENT_POWER]:
+            return SensorStateClass.MEASUREMENT
 
         return None
 
