@@ -53,7 +53,7 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
     The oid of this value
     """
 
-    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, coordinator: DataUpdateCoordinator, id: str, name: str, unit: str, oid: int):
+    def __init__(self, hass: HomeAssistant, entry: ConfigEntry, coordinator: DataUpdateCoordinator, id: str, data):
         SensorEntity.__init__(self)
         CoordinatorEntity.__init__(self, coordinator)
 
@@ -61,9 +61,10 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
         self.coordinator = coordinator
         self.entry = entry
         self._unique_id = id
-        self._name = name
-        self._unit = unit
-        self._oid = oid
+        self._name = data["uitext"]
+        self._unit = data["unit"]
+        self._oid = data["oid"]
+        self._attr_native_value = parse_number(data)
 
     @cached_property
     def name(self):
