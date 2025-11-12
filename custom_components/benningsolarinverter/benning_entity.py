@@ -12,6 +12,10 @@ from .const import DOMAIN
 
 from .benning_client import BenningClient
 
+import logging
+
+_LOGGER = logging.getLogger(__name__)
+
 class BenningEntity(SensorEntity, CoordinatorEntity):
     """
     A entity representing one specific entry / oid of the inverter.
@@ -150,10 +154,18 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
         Handle the coordinator update, will just extract the data.
         """
 
+        _LOGGER.debug("Updating data for entity with oid " + str(self._oid) + "...")
+
         data = self.coordinator.data[str(self._oid)]
 
         if data == None:
             return
 
-        self._attr_native_value = parse_number(data)
+        parsed_number = parse_number(data)
+
+        _LOGGER.debug("Parsed value for entity with oid " + str(self._oid) + " to " + str(parsed_number) + " " + str(self.unit_of_measurement))
+
+        self._attr_native_value = parsed_number
         self.async_write_ha_state()
+
+        _LOGGER.debug("Written ha state with new entity value.")

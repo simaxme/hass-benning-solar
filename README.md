@@ -30,7 +30,7 @@ This plugin can be set up by going to `Settings > Devices` and clicking on the `
 
 There, you will need to input the following values:
 
-- `Host`: The hotsname or IP-Adress of your Benning Solar Inverter in the current network.
+- `Host`: The hostname or IP-Adress of your Benning Solar Inverter in the current network.
 - `Username`: The username of your admin account. Typically `admin`.
 - `Password`: The password of your admin account. Typically `benning`.
 
@@ -52,3 +52,15 @@ I do not know whether there may have been API changes in other versions of the i
 
 The first time the integration is setup, it needs to get all available endpoints/values that can be mapped to a sensor in HASS. Because the API does not provide endpoints for checking these, it will "bruteforce" all available endpoints by checking a huge range of identifiers.
 Though the API documentation includes a table of all OIDs with their mappings, they do not always seem to properly match.
+
+
+## Debugging
+
+To debug this integration, you can enable debug logs for it. Head into your `configuration.yaml` and add the following setting:
+```yaml
+logger:
+  # ...
+  logs:
+    custom_components.benningsolarinverter: debug
+    # ...
+```

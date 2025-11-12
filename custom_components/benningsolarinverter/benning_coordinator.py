@@ -37,10 +37,14 @@ class BenningCoordinator(DataUpdateCoordinator):
         Update event
         """
 
+        _LOGGER.debug("Updating entry data...")
+
         available_entries = await self.client.get_entries(self.oids)
         mapping = {}
         for entry in available_entries:
             mapping[str(entry["oid"])] = entry
+
+        _LOGGER.debug("Updated entry data!")
 
         return mapping
 
