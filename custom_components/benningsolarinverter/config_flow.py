@@ -36,6 +36,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     This will also load all available entries and store them (which causes this function to take a couple of minutes).
     """
 
+    _LOGGER.info("Setting up benning integration...")
+
     client = BenningClient(hass, data[CONF_HOST], data[CONF_USERNAME], data[CONF_PASSWORD])
 
     await client.authenticate()
@@ -45,6 +47,8 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
     # NOTE: this may take a couple of minutes.
     available_entries = await client.get_available_entries()
 
+    _LOGGER.info("Saving all available entries to store...")
+
     store = Store(hass, 1, "benning_config")
     await store.async_save({
         "available_entries": available_entries,
@@ -53,11 +57,15 @@ async def validate_input(hass: HomeAssistant, data: dict[str, Any]) -> dict[str,
         "password": data[CONF_PASSWORD]
     })
 
+    _LOGGER.info("Saved all available entries to store!")
+
 
     # If you cannot connect:
     # throw CannotConnect
     # If the authentication is wrong:
     # InvalidAuth
+
+    _LOGGER.info("Successfully set up integration!")
 
     # Return info that you want to store in the config entry.
     return {"title": "Benning Inverter"}
