@@ -7,7 +7,7 @@ from homeassistant.helpers.entity import Entity
 from homeassistant.components.sensor import SensorDeviceClass, SensorEntity, SensorStateClass
 from homeassistant.helpers.update_coordinator import CoordinatorEntity, DataUpdateCoordinator
 
-from .utils import parse_number
+from .utils import parse_number, is_number_type
 from .const import DOMAIN
 
 from .benning_client import BenningClient
@@ -47,7 +47,7 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
     The name of this entity
     """
 
-    _unit: str
+    _unit: str | None
     """
     The unit of this value.
     """
@@ -66,7 +66,7 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
         self.entry = entry
         self._unique_id = id
         self._name = data["uitext"]
-        self._unit = data["unit"]
+        self._unit = data["unit"] if is_number_type(data["type"]) and data["unit"] != "" else None
         self._oid = data["oid"]
         self._attr_native_value = parse_number(data)
 
@@ -84,6 +84,10 @@ class BenningEntity(SensorEntity, CoordinatorEntity):
 
     @cached_property
     def native_unit_of_measurement(self):
+        # For values that are not a number
+        if self._unit == "":
+            return None
+
         if self._unit == "W/m^2":
             return "W/m²"
 
