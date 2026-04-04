@@ -1,4 +1,4 @@
-# Benning Solar Inverter Home Assistant Integration
+# (Unofficial) Benning Solar Inverter Home Assistant Integration
 
 ![](./logo/benningimage.svg)
 
@@ -42,6 +42,7 @@ Note this will be only done on setup, so don't worry that the integration takes 
 Currently this integration was tested on the following Benning Solar Inverters:
 
 - [x] Benning TLS 4.3
+- [x] Benning TLS 5.1
 
 I do not know whether there may have been API changes in other versions of the inverter. If you have another inverter model, feel free to write whether yours works properly or has issues, so I can fix possible bugs.
 
